@@ -1,5 +1,7 @@
 // Basic Lib Import
+
 const express = require("express");
+require("dotenv").config();
 const app = new express();
 const router = require("./src/routes/api");
 const bodyParser = require("body-parser");
@@ -14,7 +16,7 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const cors = require("cors");
 
-app.use(express.static("client/build"));
+// app.use(express.static("client/build"));
 
 // Security Middleware Implement
 app.use(cors());
@@ -31,20 +33,24 @@ const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 3000 });
 app.use(limiter);
 
 // Mongo DB Database Connection
-let URI = "mongodb://127.0.0.1:27017/business-table";
-let OPTION = { autoIndex: true };
-// let OPTION = { user: "nur", pass: "nur", autoIndex: true };
-mongoose.connect(URI, OPTION, (error) => {
+// let URI = "mongodb://127.0.0.1:27017/business-table";
+let atlusUrl = `mongodb+srv://<username>:<password>@cluster0.y610b.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`;
+// let OPTION = { autoIndex: true };
+let OPTION = {
+  user: process.env.user,
+  pass: process.env.password,
+  autoIndex: true,
+};
+mongoose.connect(atlusUrl, OPTION, (error) => {
   console.log("Connection Success");
   console.log(error);
 });
-
 // Routing Implement
 app.use("/", router);
 
 // Add React Front End Routing
-app.get("*", function (req, res) {
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-});
+// app.get("*", function (req, res) {
+//   res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+// });
 
 module.exports = app;
